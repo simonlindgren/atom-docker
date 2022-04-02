@@ -1,32 +1,29 @@
-# Base docker image
-FROM debian:stretch
-LABEL maintainer "Jessie Frazelle <jess@linux.com>"
+# VERSION: 0.1.0
+# DESCRIPTION: DIGSUM Docker Container for Atom with Hydrogen
+# FULL DESCRIPTION: https://github.com/simonlindgren/atom-docker
+# BUILD: sudo docker build --rm -t atom-docker .
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-	dbus-x11 \
-        git \
-	gconf2 \
-	gconf-service \
-	gvfs-bin \
-	libasound2 \
-	libcanberra-gtk-module \
-	libcap2 \
-	libgconf-2-4 \
-	libgnome-keyring-dev \
-	libgtk2.0-0 \
-	libnotify4 \
-	libnss3 \
-	libxkbfile1 \
-	libxss1 \
-	libxtst6 \
-	xdg-utils \
-	--no-install-recommends \
-	&& rm -rf /var/lib/apt/lists/*
+# Use this container from dockerhub as our base image
+FROM jupyter/datascience-notebook
 
-ENV ATOM_VERSION 1.15.0
+# Update setup stuff
+RUN pip install -U pip setuptools wheel
 
-# download the source
+# Install python packages 
+#RUN pip install -U nltk spacy networkx
+
+# Install NLTK content
+#RUN python -m nltk.downloader all
+
+# Install spacy content
+#RUN python -m spacy download en_core_web_sm
+
+# Install Jupyter theme
+#RUN pip install jupyterlab_darkside_ui
+
+# Install and launch atom
+CMD ["bash"]
+ENV ATOM_VERSION 1.59.0
 RUN buildDeps=' \
 		ca-certificates \
 		curl \
@@ -43,6 +40,7 @@ RUN apm install atom-beautify \
 	busy-signal \
 	color-picker \
  	file-icons \
+	hydrogen \
 	intentions \
 	linter \
  	linter-js-standard \
@@ -51,11 +49,6 @@ RUN apm install atom-beautify \
 	minimap \
 	pigments
 
-COPY application.json /root/.atom/storage/
-COPY config.cson /root/.atom/
-
-RUN mkdir /development
-VOLUME ["/development"]
 
 # Autorun atom
 ENTRYPOINT [ "atom", "--foreground" ]
